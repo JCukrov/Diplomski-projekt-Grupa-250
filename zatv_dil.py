@@ -241,11 +241,10 @@ if __name__ == "__main__":
 
     poredak = sorted(igraci, key=lambda x: x.ukupni_bodovi, reverse=True)
 
-    print("\n===== TABLICA PORETKA =====")
-    for idx, ig in enumerate(poredak, start=1):
-        print(f"{idx}. {ig.ime} - {ig.ukupni_bodovi} bodovi")
-
     with open('./poredak.csv', 'w+', encoding='UTF-8') as output:
-        output.write('#Rank;Ime;Ostvareni bodovi\n')
+        output.write(f'Rank;Ime;Bodovi\n')
+
+        print("\n===== TABLICA PORETKA =====")
         for idx, ig in enumerate(poredak, start=1):
+            print(f"{idx}. {ig.ime} - {ig.ukupni_bodovi} bodovi")
             output.write(f'{idx};{ig.ime};{ig.ukupni_bodovi}\n')
