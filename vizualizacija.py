@@ -79,9 +79,10 @@ def vizualiziraj_rezultate(poredak, sve_igre, directory = './output') -> None:
     for i, (bar, pct) in enumerate(zip(bars, postotak_koop)):
         axes[1, 0].text(i, pct + 2, f'{pct:.1f}%', ha='center', fontsize=8)
     
-    # 4. Primjer igre tft defec
+    # 4. Vizualizacija igre 2. strategije
     primjer_igra = next((ig for ig in sve_igre 
-                        if ig['prvi'] == 'Tit for Tat' and ig['drugi'] == 'Always defect'), None)
+                        if (ig['prvi'] == poredak[0].ime and ig['drugi'] == poredak[1].ime) or \
+                            ig['prvi'] == poredak[1].ime and ig['drugi'] == poredak[0].ime), None)
     
     if primjer_igra:
         potezi = primjer_igra['potezi'][:50]  # Prvih 50 poteza
