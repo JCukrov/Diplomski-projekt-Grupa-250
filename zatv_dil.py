@@ -15,7 +15,7 @@ def print_poredak(poredak, directory):
             output.write(f'{idx};{ig.ime};{ig.ukupni_bodovi}\n')
 
 
-def igra(prvi, drugi, broj_igra) -> [int]:
+def igra(prvi, drugi, broj_igra, suppress_move_print = False) -> [int]:
     prosli1 = 1
     prosli2 = 1
     prvi.bodovi = 0
@@ -53,15 +53,15 @@ def igra(prvi, drugi, broj_igra) -> [int]:
         drugi.ukupni_bodovi += 1
     else: drugi.ukupni_bodovi +=3
 
-
-    print("Igra zavrsena")
-    print(f"Igrac {prvi.ime} osvojio je {prvi.bodovi} bodova")
-    print(f"Igrac {drugi.ime} osvojio je {drugi.bodovi} bodova")
+    if not suppress_move_print:
+        print("Igra zavrsena")
+        print(f"Igrac {prvi.ime} osvojio je {prvi.bodovi} bodova")
+        print(f"Igrac {drugi.ime} osvojio je {drugi.bodovi} bodova")
     return potezi
 
 
 
-def zatv_dil(igraci, broj_igra = 200, directory = './output'):
+def zatv_dil(igraci, broj_igra = 200, directory = './output', suppress_move_print = False, suppress_visualization = False):
 
     protivnici = [type(i)() for i in igraci]
     
@@ -72,7 +72,7 @@ def zatv_dil(igraci, broj_igra = 200, directory = './output'):
 
         for i in range(len(igraci)):
             for j in range(i, len(protivnici)):
-                potezi = igra(igraci[i], protivnici[j], broj_igra)
+                potezi = igra(igraci[i], protivnici[j], broj_igra, suppress_move_print=suppress_move_print)
                 
                 # Spremi podatke za vizualizaciju
                 sve_igre.append({
@@ -89,9 +89,10 @@ def zatv_dil(igraci, broj_igra = 200, directory = './output'):
 
     print_poredak(poredak = poredak, directory = directory)
 
-    # Kreiraj vizualizacije
-    print("\n===== KREIRANJE VIZUALIZACIJA =====")
-    vizualiziraj_rezultate(poredak, sve_igre, directory)
+    if not suppress_visualization:
+        # Kreiraj vizualizacije
+        print("\n===== KREIRANJE VIZUALIZACIJA =====")
+        vizualiziraj_rezultate(poredak, sve_igre, directory)
 
     return poredak
 
