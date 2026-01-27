@@ -101,7 +101,7 @@ def zatv_dil(igraci, broj_igra: int = 200, directory = './output', suppress_move
         output.write('Prvi igrac;Bodovi Prvog;Drugi igrac;Bodovi drugog;Potezi\n')
 
         for i in range(len(igraci)):
-            for j in range(i, len(igraci)):
+            for j in range(i+1, len(igraci)):
                 
                 # resetiraj atribute i bodove strategija
                 igraci[i].reset()

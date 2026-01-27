@@ -2,42 +2,12 @@ import copy
 from pathlib import Path
 
 from strategije import *
+from turnir_utility import *
 from zatv_dil import zatv_dil, print_poredak
 
-def ask_yes_no(prompt: str = 'Yes or no?') -> bool:
-    '''
-    Prompts user a yes or no question
-    Args:
-        prompt - prompt for the user
-    Returns:
-        True - if user inputed y or yes
-        False - if user inputed n or no
-    '''
-    
-    while True:
-        answer = input(f'{prompt} [y/n]: ').strip().lower()
-        if answer in ('y', 'yes'):
-            return True
-        elif answer in ('n', 'no'):
-            return False
-        print('Please enter y or n.')
-
-def resetiraj_strategije(igraci) -> None:
-    '''
-    Function reinitializes strategies
-    Args:
-        igraci - list of strategies
-    Returns:
-        None
-    '''
-   
-    for item in igraci:
-        item.__init__()
-    return
 
 
-
-def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_print = False, suppress_visualization = False) -> list:
+def provedi_elimination_iter(igraci, path: Path, broj_igra: int = 200, suppress_move_print = False, suppress_visualization = False) -> list:
     '''
     Function conducts one iteration of an elimination tournament.
     Args:
@@ -55,7 +25,8 @@ def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_p
     finalni_poredak = []
 
     while len(igraci) > 1:
-
+        
+        resetiraj_strategije(igraci, reset_cumul = True)
         Path(f'{path}/round_{counter}').mkdir(parents = True, exist_ok = True)
         
         print(f'======== {counter}. runda turnira =========')
@@ -66,8 +37,6 @@ def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_p
 
         finalni_poredak.insert(0, najgori)
         igraci.remove(najgori)
-
-        resetiraj_strategije(igraci)
         
         counter += 1
 
@@ -84,7 +53,7 @@ def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_p
     return finalni_poredak
 
 
-def natjecanje(path: str = './output/turnir') -> None:
+def single_elimination(path: str = './output/turnir') -> None:
     '''
     Function which sets up a tournament (used only when with one tournament instance). For more tournaments see: ponovi_natjecanja
     Args:
@@ -95,14 +64,7 @@ def natjecanje(path: str = './output/turnir') -> None:
 
     # Izbrisi sve prethodne podatke iz turnira
 
-    path = Path(f'{path}')
-
-    if path.exists():
-        if ask_yes_no("Pokretanjem ovog programa brišu se rezultati prethodnog turnira. Želite li nastaviti?"):
-            path._delete()
-        else:
-            print('Prestanak rada.')
-            exit(0)
+    add_data_folder(path)
 
     igraci = []
     igraci.append(TFT())
@@ -116,10 +78,10 @@ def natjecanje(path: str = './output/turnir') -> None:
     igraci.append(TTFT())
     igraci.append(WSLS())
     
-    provedi_natjecanje(igraci = igraci, path = path, broj_igra = 200)
+    provedi_elimination_iter(igraci = igraci, path = path, broj_igra = 200)
 
 
-def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir') -> None:
+def elimination(n: int = 100, path = './output/elimination_turnir') -> None:
     '''
     Function for conducting multiple tournaments and gathering data from them
     Args:
@@ -129,13 +91,7 @@ def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir') -> None:
         None
     '''
 
-    path = Path(path)
-    if path.exists():
-        if ask_yes_no("Pokretanjem ovog programa brišu se rezultati prethodnih turnira. Želite li nastaviti?"):
-            path._delete()
-        else:
-            print('Prestanak rada.')
-            exit(0)
+    add_data_folder(path)
     
     igraci = []
     igraci.append(TFT())
@@ -154,7 +110,7 @@ def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir') -> None:
         score[item.ime] = 0
     for i in range(n):
 
-        result = provedi_natjecanje(path=f'{path}/turnir_{i+1}', igraci = copy.deepcopy(igraci), suppress_move_print = True, suppress_visualization = True)
+        result = provedi_elimination_iter(path=f'{path}/turnir_{i+1}', igraci = copy.deepcopy(igraci), suppress_move_print = True, suppress_visualization = True)
         for rank, player in enumerate(reversed(result)):
             score[player.ime] += rank
 
@@ -172,4 +128,4 @@ def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir') -> None:
 
 
 if __name__ == "__main__":
-    ponovi_natjecanje(100)
+    elimination(1000)
