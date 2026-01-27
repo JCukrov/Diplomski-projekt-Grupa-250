@@ -5,6 +5,14 @@ from strategije import *
 from zatv_dil import zatv_dil, print_poredak
 
 def ask_yes_no(prompt: str = 'Yes or no?') -> bool:
+    '''
+    Prompts user a yes or no question
+    Args:
+        prompt - prompt for the user
+    Returns:
+        True - if user inputed y or yes
+        False - if user inputed n or no
+    '''
     
     while True:
         answer = input(f'{prompt} [y/n]: ').strip().lower()
@@ -14,7 +22,14 @@ def ask_yes_no(prompt: str = 'Yes or no?') -> bool:
             return False
         print('Please enter y or n.')
 
-def resetiraj_strategije(igraci):
+def resetiraj_strategije(igraci) -> None:
+    '''
+    Function reinitializes strategies
+    Args:
+        igraci - list of strategies
+    Returns:
+        None
+    '''
    
     for item in igraci:
         item.__init__()
@@ -22,7 +37,18 @@ def resetiraj_strategije(igraci):
 
 
 
-def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_print = False, suppress_visualization = False):
+def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_print = False, suppress_visualization = False) -> list:
+    '''
+    Function conducts one iteration of an elimination tournament.
+    Args:
+        igraci - array of strategies
+        path - path for data output
+        broj_igra - number of games in a single round between two strategies
+        suppress_move_print - if True disables each round point gain/loss
+        suppress_visualization - if True prevents plotting of results
+    Returns:
+        list of strategies ordered by their performance (descending)
+    '''
 
     counter: int = 1
 
@@ -58,7 +84,14 @@ def provedi_natjecanje(igraci, path: Path, broj_igra: int = 200, suppress_move_p
     return finalni_poredak
 
 
-def natjecanje(path: str = './output/turnir', skip_confirm = False):
+def natjecanje(path: str = './output/turnir') -> None:
+    '''
+    Function which sets up a tournament (used only when with one tournament instance). For more tournaments see: ponovi_natjecanja
+    Args:
+        path - path for data output 
+    Returns:
+        None
+    '''
 
     # Izbrisi sve prethodne podatke iz turnira
 
@@ -86,7 +119,15 @@ def natjecanje(path: str = './output/turnir', skip_confirm = False):
     provedi_natjecanje(igraci = igraci, path = path, broj_igra = 200)
 
 
-def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir'):
+def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir') -> None:
+    '''
+    Function for conducting multiple tournaments and gathering data from them
+    Args:
+        n - number of tournaments to conduct
+        path - path for data output
+    Returns:
+        None
+    '''
 
     path = Path(path)
     if path.exists():
@@ -111,7 +152,6 @@ def ponovi_natjecanje(n: int = 100, path = './output/repeat_turnir'):
     score = {}
     for item in igraci:
         score[item.ime] = 0
-
     for i in range(n):
 
         result = provedi_natjecanje(path=f'{path}/turnir_{i+1}', igraci = copy.deepcopy(igraci), suppress_move_print = True, suppress_visualization = True)

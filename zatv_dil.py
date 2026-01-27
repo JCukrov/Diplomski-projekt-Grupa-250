@@ -5,22 +5,40 @@ from strategije import *
 from vizualizacija import vizualiziraj_rezultate
 
 
-def print_poredak(poredak, directory):
+def print_poredak(poredak, directory) -> None:
+    '''
+    Prints the final ranking to the stdout and file
+    Args:
+        poredak - orderd ranking of strategies (desc)
+        directory - directory where to output the results
+    Returns:
+        None
+    '''
     with open(f'{directory}/poredak.csv', 'w+', encoding='UTF-8') as output:
         output.write(f'Rank;Ime;Bodovi\n')
 
         print("\n===== TABLICA PORETKA =====")
         for idx, ig in enumerate(poredak, start=1):
-            print(f"{idx}. {ig.ime} - {ig.ukupni_bodovi} bodovi")
-            output.write(f'{idx};{ig.ime};{ig.ukupni_bodovi}\n')
+            print(f"{idx}. {ig.ime} - {ig.kumulativni_bodovi} bodovi")
+            output.write(f'{idx};{ig.ime};{ig.kumulativni_bodovi}\n')
 
 
-def igra(prvi, drugi, broj_igra, suppress_move_print = False) -> [int]:
+def igra(prvi, drugi, broj_igra: int, suppress_move_print: bool = False) -> [int]:
+    '''
+    Conducts one game between two strategies
+    Args:
+        prvi - first strategy
+        drugi - second strategy
+        broj_igra - number of games in a single round between two strategies
+        directory - directory where to output the results
+        suppress_move_print - if True disables each round point gain/loss
+    Returns:
+        array of all moves made each round (1. - both cooperated, 2. - only the first player cooperated, 3. only the second player cooperated, 4. neither player cooperated)
+    '''
+
     prosli1 = 1
     prosli2 = 1
-    prvi.bodovi = 0
-    drugi.bodovi = 0
-    
+
     # Potezi: 1 oboje suradivali, 2 samo prvi igrac suradivao, 3  samo drugi igrac suradivao, 4 nitko nije suradivao  
     potezi = []
 
@@ -46,9 +64,12 @@ def igra(prvi, drugi, broj_igra, suppress_move_print = False) -> [int]:
             prvi.bodovi = prvi.bodovi + 1
             drugi.bodovi = drugi.bodovi + 1
 
+    prvi.kumulativni_bodovi += prvi.bodovi
+    drugi.kumulativni_bodovi += drugi.bodovi
+
     if prvi.bodovi > drugi.bodovi:
         prvi.ukupni_bodovi += 3
-    elif drugi.bodovi == prvi.bodovi:
+    elif prvi.bodovi == drugi.bodovi:
         prvi.ukupni_bodovi += 1
         drugi.ukupni_bodovi += 1
     else: drugi.ukupni_bodovi +=3
@@ -61,9 +82,18 @@ def igra(prvi, drugi, broj_igra, suppress_move_print = False) -> [int]:
 
 
 
-def zatv_dil(igraci, broj_igra = 200, directory = './output', suppress_move_print = False, suppress_visualization = False):
-
-    protivnici = [type(i)() for i in igraci]
+def zatv_dil(igraci, broj_igra: int = 200, directory = './output', suppress_move_print: bool = False, suppress_visualization: bool = False):
+    '''
+    Conducts one game of the Prisoners Dilemma between each of the strategies
+    Args:
+        igraci - array of strategies
+        broj_igra - number of games in a single round between two strategies
+        directory - directory where to output the results
+        suppress_move_print - if True disables each round point gain/loss
+        suppress_visualization - if True prevents plotting of results
+    Returns:
+        ordered array of strategies based on performance (descending)
+    '''
     
     sve_igre = []
 
@@ -71,21 +101,26 @@ def zatv_dil(igraci, broj_igra = 200, directory = './output', suppress_move_prin
         output.write('Prvi igrac;Bodovi Prvog;Drugi igrac;Bodovi drugog;Potezi\n')
 
         for i in range(len(igraci)):
-            for j in range(i, len(protivnici)):
-                potezi = igra(igraci[i], protivnici[j], broj_igra, suppress_move_print=suppress_move_print)
+            for j in range(i, len(igraci)):
+                
+                # resetiraj atribute i bodove strategija
+                igraci[i].reset()
+                igraci[j].reset()
+
+                potezi = igra(igraci[i], igraci[j], broj_igra, suppress_move_print=suppress_move_print)
                 
                 # Spremi podatke za vizualizaciju
                 sve_igre.append({
                     'prvi': igraci[i].ime,
-                    'drugi': protivnici[j].ime,
+                    'drugi': igraci[j].ime,
                     'bodovi_prvi': igraci[i].bodovi,
-                    'bodovi_drugi': protivnici[j].bodovi,
+                    'bodovi_drugi': igraci[j].bodovi,
                     'potezi': potezi
                 })
                 
-                output.write(f'{igraci[i].ime};{igraci[i].bodovi};{protivnici[j].ime};{protivnici[j].bodovi};{potezi}\n')
+                output.write(f'{igraci[i].ime};{igraci[i].bodovi};{igraci[j].ime};{igraci[j].bodovi};{potezi}\n')
 
-    poredak = sorted(igraci, key=lambda x: x.ukupni_bodovi, reverse=True)
+    poredak = sorted(igraci, key=lambda x: x.kumulativni_bodovi, reverse=True)
 
     print_poredak(poredak = poredak, directory = directory)
 
