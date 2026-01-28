@@ -44,6 +44,10 @@ def natjecanje(broj_igra: int = 200):
     igraci.append(STFT())
     igraci.append(TTFT())
     igraci.append(WSLS())
+    igraci.append(DOWNING())
+    igraci.append(FELD())
+    igraci.append(SHUBIK())
+    igraci.append(NYDEGGER())
 
     counter: int = 1
 

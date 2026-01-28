@@ -108,5 +108,9 @@ if __name__ == "__main__":
     igraci.append(STFT())
     igraci.append(TTFT())
     igraci.append(WSLS())
+    igraci.append(DOWNING())
+    igraci.append(FELD())
+    igraci.append(SHUBIK())
+    igraci.append(NYDEGGER())
     
     zatv_dil(igraci = igraci)
