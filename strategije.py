@@ -3,9 +3,36 @@ import random
 class Strategija:
     def __init__(self):
         self.potez = 0
+        # broj bodova u jednoj igri
         self.bodovi = 0
+        # ukupni ostvareni broj bodova kroz sve igre
+        self.kumulativni_bodovi = 0
+        # match-win sistem dodjele bodova
         self.ukupni_bodovi = 0
 
+    def reset(self):
+        self.potez = 0
+        self.bodovi = 0
+        # Reset strategy-specific state
+        if hasattr(self, 'moj_prosli'):  # WSLS
+            self.moj_prosli = 1
+        if hasattr(self, 'counter'):  # TF2T, NYDEGGER, SHUBIK
+            self.counter = 0
+        if hasattr(self, 'kazna'):   # TTFT, SHUBIK
+            self.kazna = 0
+        if hasattr(self, 'flag'):    # FRIEDMAN
+            self.flag = 0
+        if hasattr(self, 'punish'):
+            self.punish = False
+        if hasattr(self, 'nakonC_total'): #DOWNING
+            self.nakonC_total = 0
+            self.nakonC_C = 0
+            self.nakonD_total = 0
+            self.nakonD_C = 0
+            self.zadnji = 0
+        if hasattr(self, 'zadnji'): #NYDEGGER
+            self.zadnji = 0
+            
 
 class ACO(Strategija):
     def __init__(self):
@@ -113,18 +140,18 @@ class WSLS(Strategija):
     
 class JOSS(Strategija):
     def __init__(self):
-        self.ime = "JOSS"
         super().__init__()
+        self.ime = "JOSS"
 
 
     def igraj(self, i, protivnik_prosli):
         if i == 0:
             potez = 1
-        elif protivnik_prosli == 0:
-            potez = protivnik_prosli
+        elif not protivnik_prosli:
+            potez = 0
         else:
             if random.random() < 0.9:
-                potez = protivnik_prosli
+                potez = 1
             else:
                 potez = 0
 
@@ -132,7 +159,7 @@ class JOSS(Strategija):
     
 class FRIEDMAN(Strategija):
     def __init__(self):
-        self.ime = "FRIEDMAN"
+        self.ime = "FRIEDMAN (Grim Trigger)"
         self.flag = 0
         super().__init__()
 
