@@ -9,7 +9,7 @@ def vizualiziraj_rezultate(poredak, sve_igre, directory = './output') -> None:
     
     # Poredak igrača
     imena = [ig.ime for ig in poredak]
-    bodovi = [ig.ukupni_bodovi for ig in poredak]
+    bodovi = [ig.kumulativni_bodovi for ig in poredak]
     
     colors = plt.cm.viridis(np.linspace(0, 1, len(imena)))
     bars = axes[0, 0].barh(imena, bodovi, color=colors)
