@@ -34,8 +34,10 @@ def round_robin(n: int = 100, path: str = './output/round_robin'):
     igraci.append(NYDEGGER())
 
     score = {}
+    total_cumul_score = {}
     for item in igraci:
         score[item.ime] = 0
+        total_cumul_score[item.ime] = 0
 
     add_data_folder(path)
 
@@ -49,17 +51,18 @@ def round_robin(n: int = 100, path: str = './output/round_robin'):
 
         for rank, player in enumerate(reversed(result)):
             score[player.ime] += rank
+            total_cumul_score[player.ime] += player.kumulativni_bodovi
 
     sorted_result = sorted(score.items(), key = lambda x: x[1], reverse=True)
 
     with open(f'{path}/final_stats.csv', 'w') as output:
-        output.write('Pozicija;Ime strategije;Broj bodova\n')
+        output.write('Pozicija;Ime strategije;Broj bodova (proporcionalno plasmanu);Broj bodova (sveukupno ostvareno)\n')
 
         print(f'\n\n========== Poredak nakon {n} turnira ==========')
 
         for idx, (name, points) in enumerate(sorted_result, start=1):
-            print(f'{idx}. {name}: {points}')
-            output.write(f'{idx};{name};{points}')
+            print(f'{idx}. {name}: {points} (proporcionalno plasmanu), {total_cumul_score[name]} (sveukupno ostvareno)')
+            output.write(f'{idx};{name};{points};{total_cumul_score[name]}\n')
 
 if __name__ == '__main__':
     round_robin(1000)
